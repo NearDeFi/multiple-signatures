@@ -1137,7 +1137,7 @@ dependencies = [
 [[package]]
 name = "omni-transaction"
 version = "0.2.4"
-source = "git+https://github.com/near/omni-transaction-rs.git?branch=owen#cb1a397634b23a92890a041b71cfc1f289e5528a"
+source = "git+https://github.com/near/omni-transaction-rs?rev=b4c56fd90d0fedfec96809e9708dad4ae90ebcdf#b4c56fd90d0fedfec96809e9708dad4ae90ebcdf"
 dependencies = [
  "borsh",
  "bs58 0.5.1",

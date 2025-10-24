@@ -1,43 +1,87 @@
-# multiple-sign
+# multiple-signatures
 
-cargo-near-new-project-description
+This contract takes an array of signature requests, gets signatures for them and returns them as an array. This is useful when needing to make multiple signature requests from Aurora as an Aurora to NEAR cross contract call is very gas expensive, thus it is more gas efficient to batch the signature requests on the NEAR side.
 
-## How to Build Locally?
+## Notice 
 
-Install [`cargo-near`](https://github.com/near/cargo-near) and run:
+TODO 
+
+## One Contract per Protocol
+
+Since the accounts that can be signed for are fixed for a given predecessor caller to the MPC, the accounts are tied to this contract. To maintain the same accounts you need to maintain this contract under the same NEAR account name. The contract must only let your contract on Aurora call it, otherwise anyone would be able to sign for the derived accounts.
+
+## TODO 
+
+Add contract upgradability 
+
+## Deploying 
+
+Download cargo near 
+
+https://github.com/near/cargo-near
+
+Create account
 
 ```bash
-cargo near build
+cargo near create-dev-account
 ```
 
-## How to Test Locally?
+Deploy
 
 ```bash
-cargo test
+cargo near deploy
 ```
 
-## How to Deploy?
+Init args 
 
-Deployment is automated with GitHub Actions CI/CD pipeline.
-To deploy manually, install [`cargo-near`](https://github.com/near/cargo-near) and run:
-
-If you deploy for debugging purposes:
-```bash
-cargo near deploy build-non-reproducible-wasm <account-id>
+```json
+{
+    "mpc_contract_id": "", // v1.signer-prod.testnet for testnet v1.signer for mainnet
+    "owner_id": "",
+    "permitted_caller": "",
+}
 ```
 
-If you deploy production ready smart contract:
-```bash
-cargo near deploy build-reproducible-wasm <account-id>
-```
 
-## Useful Links
+## Gas 
 
-- [cargo-near](https://github.com/near/cargo-near) - NEAR smart contract development toolkit for Rust
-- [near CLI](https://near.cli.rs) - Interact with NEAR blockchain from command line
-- [NEAR Rust SDK Documentation](https://docs.near.org/sdk/rust/introduction)
-- [NEAR Documentation](https://docs.near.org)
-- [NEAR StackOverflow](https://stackoverflow.com/questions/tagged/nearprotocol)
-- [NEAR Discord](https://near.chat)
-- [NEAR Telegram Developers Community Group](https://t.me/neardev)
-- NEAR DevHub: [Telegram](https://t.me/neardevhub), [Twitter](https://twitter.com/neardevhub)
+The contract was tested for gas consumed for a different numbers of requests
+
+1 sig = 20 tgas
+6 sig = 110 tgas 
+10 sig = 185 tgas
+15 sig = 290 tgas 
+
+There are five parts where gas is consumed 
+
+pre request constant = c1
+callback constant = c2 
+pre request multiplier = x
+post request multiplier = y
+gas per mpc call = 15 tgas 
+
+This means the contract must have gas requirements that satisfying the following inequalities (this includes a 10 tgas buffer).
+
+x+y+c1+c2>15
+6x+6y+c1+c2>30
+10x+10y+c1+c2>45
+15x+15y+c1+c2>75
+
+Reasonable values that minimize these are 
+
+x=2 
+y=2
+c1=8
+c2=8
+
+The required gas goes as 
+
+tgas required = n(15+x+y)+c1+c2
+
+where n is the number of requests 
+
+For these chosen values 
+
+tgas required = 19n+16
+
+Gas may be able to be optimized further with further testing

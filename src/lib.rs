@@ -1,8 +1,9 @@
 use near_sdk::{
     env::{self},
-    log, near, require, AccountId, Gas, NearToken, PanicOnDefault, Promise,
+    log, near, AccountId, Gas, NearToken, PanicOnDefault, Promise, 
+    require,
 };
-use omni_transaction::signer::types::{SignRequest, SignatureResponse};
+use omni_transaction::signer::types::{SignRequestArgs, SignatureResponse};
 
 mod chainsig;
 
@@ -10,33 +11,52 @@ mod chainsig;
 #[derive(PanicOnDefault)]
 pub struct Contract {
     pub mpc_contract_id: AccountId,
+    pub owner_id: AccountId,
+    pub permitted_caller: AccountId,
 }
+
+// Gas can be optimized by dynamically changing the gas required for initial gas and callback gas based on the number of requests
+const SIGNATURE_GAS: Gas = Gas::from_tgas(15);
+const INITIAL_GAS_CONSTANT: Gas = Gas::from_tgas(8);
+const CALLBACK_GAS_CONSTANT: Gas = Gas::from_tgas(8);
+const INITIAL_GAS_MULTIPLIER: Gas = Gas::from_tgas(2);
+const CALLBACK_GAS_MULTIPLIER: Gas = Gas::from_tgas(2);
+
+const ATTACHED_DEPOSIT: NearToken = NearToken::from_yoctonear(1);
 
 #[near]
 impl Contract {
     #[init]
-    pub fn new(mpc_contract_id: AccountId) -> Self {
+    pub fn new(mpc_contract_id: AccountId, owner_id: AccountId, permitted_caller: AccountId) -> Self {
         Self {
             mpc_contract_id, // v1.signer-prod.testnet for testnet v1.signer for mainnet
+            permitted_caller,
+            owner_id,
         }
     }
 
-    pub fn request_signatures(&mut self, requests: Vec<SignRequest>) -> Promise {
-        for (_, request) in requests.iter().enumerate() {
-            require!(
-                request.key_version == 0,
-                "Key version must be 0, only secp256k1 is supported currently"
-            );
-        }
+    pub fn update_permitted_caller(&mut self, new_permitted_caller: AccountId) {
+        require!(env::predecessor_account_id() == self.owner_id, "Only the owner can call this contract");
+        self.permitted_caller = new_permitted_caller;
+    }
 
+    pub fn update_owner(&mut self, new_owner_id: AccountId) {
+        require!(env::predecessor_account_id() == self.owner_id, "Only the owner can call this contract");
+        self.owner_id = new_owner_id;
+    }
+
+    pub fn request_signatures(&mut self, requests: Vec<SignRequestArgs>) -> Promise {
+        require!(env::predecessor_account_id() == self.permitted_caller, "Only the permitted caller can call this contract");
+        log!("Requesting signatures for {} requests", requests.len());
+        require_enough_gas(requests.len() as u64);
         chainsig::internal_request_signatures(requests, self.mpc_contract_id.clone())
     }
 
     #[private]
     pub fn resolve_signatures(
         &self,
-        requests: Vec<SignRequest>,
-    ) -> Vec<(SignRequest, Result<SignatureResponse, ()>)> {
+        requests: Vec<SignRequestArgs>,
+    ) -> Vec<(SignRequestArgs, Result<SignatureResponse, ()>)> {
         let mut results = Vec::new();
         let mut successful_count = 0;
 
@@ -50,7 +70,7 @@ impl Contract {
                             Ok(sig_response)
                         }
                         Err(e) => {
-                            log!("Failed to deserialize signature response: {:?}", e);
+                            log!("Failed to deserialize signature response for request {}: {:?}", i, e);
                             Err(())
                         }
                     }
@@ -75,14 +95,28 @@ impl Contract {
     }
 }
 
-// Delete account
-// near account delete-account green-harbor.testnet beneficiary pivortex.testnet network-config testnet sign-with-legacy-keychain send
-
-// Create account
-// near account create-account sponsor-by-faucet-service green-harbor.testnet autogenerate-new-keypair save-to-legacy-keychain network-config testnet create
-
-// Deploy
-// cargo near deploy build-non-reproducible-wasm green-harbor.testnet with-init-call new json-args '{"mpc_contract_id": "v1.signer-prod.testnet"}' prepaid-gas '100.0 Tgas' attached-deposit '0 NEAR' network-config testnet sign-with-legacy-keychain send
-
-// Works for up to 17 signatures
-// Only supports secp256k1 currently
+fn require_enough_gas(number_of_requests: u64) {
+    log!("Prepaid gas: {}", env::prepaid_gas());
+    
+    // Calculate initial gas: constant + (multiplier * number_of_requests)
+    let initial_gas = INITIAL_GAS_CONSTANT.saturating_add(
+        INITIAL_GAS_MULTIPLIER.saturating_mul(number_of_requests)
+    );
+    
+    // Calculate callback gas: constant + (multiplier * number_of_requests)
+    let callback_gas = CALLBACK_GAS_CONSTANT.saturating_add(
+        CALLBACK_GAS_MULTIPLIER.saturating_mul(number_of_requests)
+    );
+    
+    // Calculate total required gas: (signature gas * number_of_requests) + initial gas + callback gas
+    let required_gas = SIGNATURE_GAS.saturating_mul(number_of_requests)
+        .saturating_add(initial_gas)
+        .saturating_add(callback_gas);
+    
+    log!("Required gas: {} (signatures: {}, initial: {}, callback: {})", 
+         required_gas, 
+         SIGNATURE_GAS.saturating_mul(number_of_requests),
+         initial_gas, 
+         callback_gas);
+    require!(env::prepaid_gas() >= required_gas, "Insufficient gas");
+}

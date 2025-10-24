@@ -1,6 +1,6 @@
 [package]
 name = "contract"
-description = "Simple Pay to Sign"
+description = ""
 version = "0.1.0"
 edition = "2021"
 
@@ -15,8 +15,7 @@ base64 = "0.22.1"
 serde = "1.0.217"
 borsh = "1.5.1"
 hex = "0.4.3"
-omni-transaction = { git = "https://github.com/near/omni-transaction-rs.git", branch = "owen" }
-
+omni-transaction = { git = "https://github.com/near/omni-transaction-rs", rev = "b4c56fd90d0fedfec96809e9708dad4ae90ebcdf" }
 
 [dev-dependencies]
 near-sdk = { version = "5.7.0", features = ["unit-testing"] }
