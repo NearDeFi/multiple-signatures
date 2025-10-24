@@ -6,6 +6,7 @@ use near_sdk::{
 use omni_transaction::signer::types::{SignRequestArgs, SignatureResponse};
 
 mod chainsig;
+mod upgrade;
 
 #[near(contract_state)]
 #[derive(PanicOnDefault)]

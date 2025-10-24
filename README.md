@@ -10,10 +10,6 @@ TODO
 
 Since the accounts that can be signed for are fixed for a given predecessor caller to the MPC, the accounts are tied to this contract. To maintain the same accounts you need to maintain this contract under the same NEAR account name. The contract must only let your contract on Aurora call it, otherwise anyone would be able to sign for the derived accounts.
 
-## TODO 
-
-Add contract upgradability 
-
 ## Deploying 
 
 Download cargo near 
@@ -37,8 +33,8 @@ Init args
 ```json
 {
     "mpc_contract_id": "", // v1.signer-prod.testnet for testnet v1.signer for mainnet
-    "owner_id": "",
-    "permitted_caller": "",
+    "owner_id": "", // Can set new owners, new permitted caller, update the contract code - should likely be a multisig 
+    "permitted_caller": "", // The account or contract that is permitted to call the request_signatures function
 }
 ```
 
@@ -85,3 +81,7 @@ For these chosen values
 tgas required = 19n+16
 
 Gas may be able to be optimized further with further testing
+
+## Updating the contract 
+
+See https://docs.near.org/smart-contracts/release/upgrade#programmatic-update
