@@ -37,17 +37,17 @@ impl Contract {
     }
 
     pub fn update_permitted_caller(&mut self, new_permitted_caller: AccountId) {
-        require!(env::predecessor_account_id() == self.owner_id, "Only the owner can call this contract");
+        require!(env::predecessor_account_id() == self.owner_id, "Only the owner can call this function");
         self.permitted_caller = new_permitted_caller;
     }
 
     pub fn update_owner(&mut self, new_owner_id: AccountId) {
-        require!(env::predecessor_account_id() == self.owner_id, "Only the owner can call this contract");
+        require!(env::predecessor_account_id() == self.owner_id, "Only the owner can call this function");
         self.owner_id = new_owner_id;
     }
 
     pub fn request_signatures(&mut self, requests: Vec<SignRequestArgs>) -> Promise {
-        require!(env::predecessor_account_id() == self.permitted_caller, "Only the permitted caller can call this contract");
+        require!(env::predecessor_account_id() == self.permitted_caller, "Only the permitted caller can call this function");
         log!("Requesting signatures for {} requests", requests.len());
         require_enough_gas(requests.len() as u64);
         chainsig::internal_request_signatures(requests, self.mpc_contract_id.clone())
