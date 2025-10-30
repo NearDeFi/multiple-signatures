@@ -4,7 +4,7 @@ This contract takes an array of signature requests, gets signatures for them and
 
 ## Notice 
 
-Before using this repo please review our [NOTICE.txt](./NOTICE.txt) file
+Before using this repo please review the [NOTICE.txt](./NOTICE.txt) file
 
 ## One Contract per Protocol
 
