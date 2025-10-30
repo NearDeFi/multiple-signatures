@@ -1,5 +1,5 @@
 use crate::*;
-use omni_transaction::signer::types::{SignRequestArgs, mpc_contract};
+use omni_transaction::signer::types::{mpc_contract, SignRequestArgs};
 
 fn join_all<I>(mut iter: I) -> Promise
 where
@@ -15,9 +15,11 @@ pub fn internal_request_signatures(
 ) -> Promise {
     // Create promises for all signature requests
     let calls = requests.iter().map(|request| {
-        // Validate each request before requesting signature 
-        request.validate_payload_length().expect("Invalid payload size");
-        
+        // Validate each request before requesting signature
+        request
+            .validate_payload_length()
+            .expect("Invalid payload size");
+
         mpc_contract::ext(mpc_contract_id.clone())
             .with_static_gas(SIGNATURE_GAS)
             .with_attached_deposit(ATTACHED_DEPOSIT)
@@ -25,9 +27,8 @@ pub fn internal_request_signatures(
     });
 
     // Calculate callback gas: constant + (multiplier * number_of_requests)
-    let callback_gas = CALLBACK_GAS_CONSTANT.saturating_add(
-        CALLBACK_GAS_MULTIPLIER.saturating_mul(requests.len() as u64)
-    );
+    let callback_gas = CALLBACK_GAS_CONSTANT
+        .saturating_add(CALLBACK_GAS_MULTIPLIER.saturating_mul(requests.len() as u64));
     // Join all promises and then resolve with callback
     join_all(calls).then(
         Contract::ext(env::current_account_id())
