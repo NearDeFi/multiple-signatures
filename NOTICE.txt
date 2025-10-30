@@ -1,0 +1,71 @@
+========================================================================
+NOTICE
+Copyright (c) Proximity 2025 
+========================================================================
+
+This project incorporates open-source dependencies or components under the following licenses:
+
+MIT, BSD-2-Clause, BSD-3-Clause, CC0-1.0, Zlib, Apache-2.0, MPL-2.0, and Unicode-3.0.
+
+-------------------------------------------------------------------------------
+Open Source Dependencies, Components, and Licenses
+-------------------------------------------------------------------------------
+
+The following open-source materials may be included, directly or indirectly, in this project. Each component remains subject to its respective license:
+
+- MIT Licensed Components
+Permission is granted to use, copy, modify, merge, publish, distribute, sublicense,  and/or sell copies of the Software, subject to inclusion of this notice.
+
+- BSD-2-Clause Components
+Redistribution and use in source and binary forms, with or without modification, are permitted provided that the above copyright notice and this paragraph appear in all copies.
+
+- BSD-3-Clause Components
+Redistribution and use are permitted with attribution, provided that neither the name of the copyright holder nor contributors may be used to endorse or promote derived products without written permission.
+
+- CC0-1.0 Components
+Public-domain dedication. No attribution or licensing obligations apply.
+
+- Zlib Components
+Provided 'as-is' without warranty; authors are not liable for damages arising from use or misuse. Must retain this notice unmodified.
+
+- Apache-2.0 Components
+Licensed under the Apache License, Version 2.0. You may obtain a copy at 
+
+http://www.apache.org/licenses/LICENSE-2.0
+
+NOTICE: You must include this NOTICE file when redistributing Apache-2.0 materials.
+
+- MPL-2.0 Components
+Each modified source file must remain under the Mozilla Public License 2.0. You may obtain a copy at https://www.mozilla.org/MPL/2.0/
+
+- Unicode-3.0 Components
+  © 1991–2025 Unicode, Inc.
+The Unicode data files and software are provided “as is” without warranty. Redistribution must include reference to the Unicode Consortium.
+
+-------------------------------------------------------------------------------
+Disclaimers and Security Notice
+-------------------------------------------------------------------------------
+THIS SOFTWARE IS PROVIDED “AS IS”, WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NON-INFRINGEMENT.
+
+This project **has not been independently audited or security-reviewed**. It may contain bugs, vulnerabilities, or other defects that could result in unintended behavior, including but not limited to **loss of funds, tokens, or digital assets**.
+
+By using, deploying, or integrating this code, you acknowledge and agree that:
+
+- You assume all risks associated with its use;
+
+- The authors, contributors, and maintainers are **not liable** for any direct, indirect, incidental, special, exemplary, or consequential damages (including loss of assets or profits); and
+
+- You are strongly encouraged to conduct an independent security audit prior to 
+  production use.
+
+-------------------------------------------------------------------------------
+Attribution and Redistribution
+-------------------------------------------------------------------------------
+Redistributions of this project, whether modified or unmodified, must:
+1. Retain this NOTICE file in full;
+2. Include the applicable third-party license texts (e.g., in LICENSE-THIRD-PARTY.txt); and
+3. Preserve all SPDX identifiers and copyright headers in individual files.
+
+-------------------------------------------------------------------------------
+End of NOTICE
+-------------------------------------------------------------------------------
